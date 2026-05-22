@@ -1,0 +1,28 @@
+# Implementation A: controller + dashboard join the network created by Containerlab ("clab").
+# Router and cEOS switch are started by Containerlab (topology.clab.yml), not by Compose.
+name: netlab-clab
+services:
+  controller:
+    build: ./controller
+    environment:
+      ROUTER_HOST: clab-netlab-router
+      SWITCH_HOST: clab-netlab-switch
+      SWITCH_CHECK_PORT: "443"
+    ports: ["127.0.0.1:8000:8000"]
+    networks: [clab]
+  dashboard:
+    build: .
+    env_file: [.env]
+    environment:
+      FLASK_HOST: 0.0.0.0
+      SWITCH_MODE: eos
+      SWITCH_HOST: clab-netlab-switch
+      ROUTER_HOST: clab-netlab-router
+      CONTROLLER_URL: http://controller:8000
+      SWITCH_TEST_INTERFACE: Ethernet1
+    ports: ["127.0.0.1:5000:5000"]
+    networks: [clab]
+    depends_on: [controller]
+networks:
+  clab:
+    external: true
