@@ -1,0 +1,71 @@
+# Implementation B (default): everything runs as plain ARM64 containers on Docker Desktop.
+name: netlab
+services:
+  controller:
+    build: ./controller
+    environment:
+      ROUTER_HOST: router
+      ROUTER_CHECK_PORT: "22"
+      SWITCH_HOST: ${SWITCH_HOST:-switch}
+      SWITCH_CHECK_PORT: "22"
+    ports: ["127.0.0.1:8000:8000"]          # optional: lets you curl the controller from the Mac
+    networks: [mgmt]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request as u; u.urlopen('http://127.0.0.1:8000/health', timeout=2)"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  router:
+    build: ./router
+    hostname: frr-router
+    environment:
+      LAB_USER: ${LAB_USER:-admin}
+      LAB_PASSWORD: ${LAB_PASSWORD:-labpassword}
+    cap_add: [NET_ADMIN, NET_RAW]            # zebra programs kernel routes/addresses. NOT privileged.
+    ports: ["127.0.0.1:2222:22"]             # optional: ssh from the Mac for manual checks
+    networks:
+      mgmt: {}
+      data: {ipv4_address: 10.10.0.2}
+    healthcheck:
+      test: ["CMD-SHELL", "sudo -n vtysh -c 'show version' >/dev/null 2>&1 && pidof sshd >/dev/null"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  switch:
+    build: ./switch
+    hostname: lab-switch
+    environment:
+      LAB_USER: ${LAB_USER:-admin}
+      LAB_PASSWORD: ${LAB_PASSWORD:-labpassword}
+    cap_add: [NET_ADMIN]                     # creates a Linux bridge + veth ports. NOT privileged.
+    ports: ["127.0.0.1:2223:22"]
+    networks:
+      mgmt: {}
+      data: {ipv4_address: 10.10.0.3}
+    healthcheck:
+      test: ["CMD-SHELL", "ip link show br0 >/dev/null 2>&1 && pidof sshd >/dev/null"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  dashboard:
+    build: .
+    env_file: [.env]
+    environment:
+      FLASK_HOST: 0.0.0.0                    # inside the container only
+    ports: ["127.0.0.1:5000:5000"]           # bound to the Mac's localhost only
+    networks: [mgmt]
+    depends_on:
+      controller: {condition: service_healthy}
+      router: {condition: service_healthy}
+      switch: {condition: service_healthy}
+
+networks:
+  mgmt:                                      # management network (service-name DNS)
+    driver: bridge
+  data:                                      # data-plane network between router and switch
+    driver: bridge
+    ipam:
+      config: [{subnet: 10.10.0.0/24}]
