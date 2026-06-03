@@ -1,0 +1,21 @@
+# Implementation A (Arista cEOS). Requires an image YOU imported after logging in at arista.com.
+# Build the router image first:  docker build -t lab-router:latest ./router
+name: netlab
+mgmt:
+  network: clab
+  ipv4-subnet: 172.20.20.0/24
+topology:
+  nodes:
+    router:
+      kind: linux
+      image: lab-router:latest
+      cap-add: [NET_ADMIN, NET_RAW]
+      env:
+        LAB_USER: admin
+        LAB_PASSWORD: labpassword
+    switch:
+      kind: arista_ceos          # use "ceos" on older containerlab versions
+      image: ceos:4.32.2F        # <-- change to the tag printed by `docker images | grep -i ceos`
+      startup-config: switch/configuration/ceos-startup.cfg
+  links:
+    - endpoints: ["router:eth1", "switch:eth1"]   # data plane
