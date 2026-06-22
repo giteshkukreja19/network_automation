@@ -1,0 +1,15 @@
+[
+  "tests/test_controller.py::test_devices_report_down_when_unreachable",
+  "tests/test_controller.py::test_devices_report_up_for_listening_port",
+  "tests/test_controller.py::test_health",
+  "tests/test_controller.py::test_operations_validation_and_log",
+  "tests/test_controller.py::test_status_shape",
+  "tests/test_router.py::test_auth_failure_is_reported",
+  "tests/test_router.py::test_command_read_timeout_is_reported",
+  "tests/test_router.py::test_flatten_routes",
+  "tests/test_router.py::test_no_free_form_command_surface",
+  "tests/test_router.py::test_routes_uses_netmiko_and_closes",
+  "tests/test_switch.py::test_candidate_workflow_compare_commit_rollback",
+  "tests/test_switch.py::test_discard_and_validation",
+  "tests/test_switch.py::test_getters_follow_napalm_schema"
+]
