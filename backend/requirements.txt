@@ -1,0 +1,5 @@
+flask>=3.0,<4
+requests>=2.31,<3
+netmiko>=4.3,<5
+napalm>=5.0,<6
+paramiko>=3.4
