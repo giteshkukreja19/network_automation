@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0b1018">
+<title>Network Lab | Operations Console</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar" aria-label="Main navigation">
+    <a class="brand" href="#" aria-label="Network Lab home">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 32 32" fill="none">
+          <path d="M16 7v7m0 4v7M7 16h7m4 0h7" stroke="currentColor" stroke-width="1.5"/>
+          <circle cx="16" cy="5.5" r="3" fill="currentColor"/>
+          <circle cx="16" cy="26.5" r="3" fill="currentColor"/>
+          <circle cx="5.5" cy="16" r="3" fill="currentColor"/>
+          <circle cx="26.5" cy="16" r="3" fill="currentColor"/>
+          <circle cx="16" cy="16" r="3.5" fill="#0b1018" stroke="currentColor" stroke-width="1.5"/>
+        </svg>
+      </span>
+      <span class="brand-copy"><strong>NETLAB</strong><small>CONTROL PLANE</small></span>
+    </a>
+
+    <div class="nav-label">WORKSPACE</div>
+    <nav class="nav-links">
+      <a href="#sec-controller"><span class="nav-icon">◈</span>Controller<span class="nav-index">01</span></a>
+      <a href="#sec-router"><span class="nav-icon">⌁</span>Router<span class="nav-index">02</span></a>
+      <a href="#sec-switch"><span class="nav-icon">▦</span>Switch<span class="nav-index">03</span></a>
+    </nav>
+    <div class="sidebar-bottom">
+      <span class="sidebar-indicator" aria-hidden="true"></span>
+      <span><strong>LOCAL ENVIRONMENT</strong><small>Network automation lab</small></span>
+    </div>
+  </aside>
+
+  <main class="workspace">
+    <header class="topbar">
+      <div class="crumb"><span>WORKSPACE</span><span class="crumb-sep">/</span><strong>Overview</strong></div>
+      <div class="topbar-meta"><span class="env-pill"><span></span>LOCAL LAB</span><span class="topbar-divider"></span><span class="topbar-label">NETWORK OPERATIONS</span></div>
+    </header>
+
+    <div class="page-content">
+      <section class="page-intro" aria-labelledby="page-title">
+        <div>
+          <div class="eyebrow"><span class="eyebrow-line"></span>NETWORK AUTOMATION PLATFORM</div>
+          <h1 id="page-title">Operations console<span class="title-period">.</span></h1>
+          <p>Observe device health, inspect network state, and run controlled configuration tasks.</p>
+        </div>
+        <div class="intro-stamp"><span class="stamp-label">CONTROL PATHS</span><strong>03</strong><span>API · SSH · NAPALM</span></div>
+      </section>
+
+      <section class="system-strip" aria-label="Platform components">
+        <div class="system-strip-title"><span class="pulse-dot"></span>LAB COMPONENTS</div>
+        <div class="system-item"><span class="system-code">API</span><span><strong>REST controller</strong><small>Flask → FastAPI</small></span></div>
+        <div class="system-item"><span class="system-code violet">RTR</span><span><strong>Router</strong><small>Netmiko · SSH · FRR</small></span></div>
+        <div class="system-item"><span class="system-code orange">SW</span><span><strong>Switch</strong><small>NAPALM · {{ switch_info.mode }}</small></span></div>
+        <div class="system-strip-note">Select a device below to run an operation</div>
+      </section>
+
+      <div class="section-heading">
+        <div><span class="eyebrow">DEVICE MANAGEMENT</span><h2>Control surfaces</h2></div>
+        <span class="section-count">03 SERVICES</span>
+      </div>
+
+      <div class="device-grid">
+        <section class="device-card controller-card" id="sec-controller" aria-labelledby="h-c">
+          <div class="card-heading">
+            <div class="device-title">
+              <span class="device-icon api-icon" aria-hidden="true">◈</span>
+              <div><span class="card-kicker">01 / API SERVICE</span><h2 id="h-c">REST Controller</h2></div>
+            </div>
+            <span class="connection-state"><span class="dot" id="controller-dot"></span><span id="controller-status">Not checked</span></span>
+          </div>
+          <p class="card-description">Monitor the controller, enumerate lab devices, and inspect orchestration status.</p>
+          <div class="facts">
+            <div><dt>Health</dt><dd id="controller-health">–</dd></div>
+            <div><dt>Last execution</dt><dd id="controller-time">–</dd></div>
+          </div>
+          <div class="card-actions">
+            <span class="action-label">OPERATIONS</span>
+            <div class="actions">
+              <button class="primary-button" data-api="/api/controller/health" data-sec="controller">Check health <span aria-hidden="true">↗</span></button>
+              <button data-api="/api/controller/status" data-sec="controller">Controller status</button>
+              <button data-api="/api/controller/devices" data-sec="controller">List devices</button>
+            </div>
+          </div>
+          <div class="msg" id="controller-msg" role="status" aria-live="polite"></div>
+          <div id="controller-table"></div>
+          <details class="response-details"><summary>Raw API response</summary><pre id="controller-out">Nothing run yet.</pre></details>
+        </section>
+
+        <section class="device-card router-card" id="sec-router" aria-labelledby="h-r">
+          <div class="card-heading">
+            <div class="device-title">
+              <span class="device-icon router-icon" aria-hidden="true">⌁</span>
+              <div><span class="card-kicker">02 / ROUTING</span><h2 id="h-r">Router</h2></div>
+            </div>
+            <span class="connection-state"><span class="dot" id="router-dot"></span><span id="router-status">Not checked</span></span>
+          </div>
+          <p class="card-description">Inspect FRRouting state and manage the lab loopback test configuration.</p>
+          <dl class="facts">
+            <div><dt>Hostname</dt><dd id="router-hostname">–</dd></div>
+            <div><dt>Management IP</dt><dd id="router-ip">–</dd></div>
+            <div class="fact-wide"><dt>Last execution</dt><dd id="router-time">–</dd></div>
+          </dl>
+          <div class="card-actions">
+            <span class="action-label">OBSERVE</span>
+            <div class="actions">
+              <button class="primary-button" data-api="/api/router/connect" data-sec="router">Connect <span aria-hidden="true">↗</span></button>
+              <button data-api="/api/router/routes" data-sec="router">Routes</button>
+              <button data-api="/api/router/interfaces" data-sec="router">Interfaces</button>
+              <button data-api="/api/router/version" data-sec="router">Version</button>
+            </div>
+          </div>
+          <div class="card-actions config-actions">
+            <span class="action-label">CONFIGURE</span>
+            <div class="actions">
+              <button data-api="/api/router/loopback/configure" data-method="POST" data-sec="router">Configure test loopback</button>
+              <button data-api="/api/router/loopback/verify" data-sec="router">Verify</button>
+              <button class="quiet" data-api="/api/router/loopback/restore" data-method="POST" data-sec="router">Restore original</button>
+            </div>
+          </div>
+          <div class="msg" id="router-msg" role="status" aria-live="polite"></div>
+          <div id="router-table"></div>
+          <details class="response-details"><summary>Last command output</summary><pre id="router-out">Nothing run yet.</pre></details>
+        </section>
+
+        <section class="device-card switch-card" id="sec-switch" aria-labelledby="h-s">
+          <div class="card-heading">
+            <div class="device-title">
+              <span class="device-icon switch-icon" aria-hidden="true">▦</span>
+              <div><span class="card-kicker">03 / SWITCHING</span><h2 id="h-s">Switch</h2></div>
+            </div>
+            <span class="connection-state"><span class="dot" id="switch-dot"></span><span id="switch-status">Not checked</span></span>
+          </div>
+          <p class="card-description">Read switch facts and interface state, or apply a reversible description test.</p>
+          <p class="driver"><span>ACTIVE DRIVER</span>{{ switch_info.driver }}</p>
+          <dl class="facts">
+            <div><dt>Hostname</dt><dd id="switch-hostname">–</dd></div>
+            <div><dt>Management IP</dt><dd id="switch-ip">–</dd></div>
+            <div class="fact-wide"><dt>Last execution</dt><dd id="switch-time">–</dd></div>
+          </dl>
+          <div class="card-actions">
+            <span class="action-label">OBSERVE</span>
+            <div class="actions">
+              <button class="primary-button" data-api="/api/switch/connect" data-sec="switch">Connect <span aria-hidden="true">↗</span></button>
+              <button data-api="/api/switch/facts" data-sec="switch">Facts</button>
+              <button data-api="/api/switch/interfaces" data-sec="switch">Interfaces</button>
+              <button data-api="/api/switch/counters" data-sec="switch">Counters</button>
+            </div>
+          </div>
+          <div class="card-actions config-actions">
+            <span class="action-label">CONFIGURE</span>
+            <div class="actions">
+              <button data-api="/api/switch/description/configure" data-method="POST" data-sec="switch">Set test description</button>
+              <button data-api="/api/switch/description/verify" data-sec="switch">Verify</button>
+              <button class="quiet" data-api="/api/switch/description/restore" data-method="POST" data-sec="switch">Restore original</button>
+            </div>
+          </div>
+          <div class="msg" id="switch-msg" role="status" aria-live="polite"></div>
+          <div id="switch-table"></div>
+          <details class="response-details"><summary>Switch output</summary><pre id="switch-out">Nothing run yet.</pre></details>
+        </section>
+      </div>
+      <footer class="page-footer"><span>NETWORK LAB / OPERATIONS CONSOLE</span><span>LOCAL ENVIRONMENT <i></i></span></footer>
+    </div>
+  </main>
+</div>
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
